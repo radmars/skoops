@@ -5,15 +5,41 @@ using UnityEngine;
 public class Court : MonoBehaviour
 {
     public int xSize, ySize;
-    public Tile basicTile;
+    public Tile tileTemplate;
     public Tile[] tiles;
+    public Ballman ballmanTemplate;
     private Tile over;
     private Tile selected;
     private Dictionary<Tile, Ballman> ballmen;
 
+    public static IList<T> Shuffle<T>(IList<T> list)
+    {
+        var rng = new System.Random();
+        int n = list.Count;
+        while (n > 1)
+        {
+            n--;
+            int k = rng.Next(n + 1);
+            T value = list[k];
+            list[k] = list[n];
+            list[n] = value;
+        }
+        return list;
+    }
+
     private void Start()
     {
-        ballmen = new Dictionary<Tile, Ballman>();
+        var randomTiles = new Queue<Tile>(Shuffle(new List<Tile>(tiles)));
+
+        for(var i = 0; i < 5; i ++)
+        {
+            var b = Instantiate(ballmanTemplate);
+            b.gameObject.SetActive(true);
+            b.name = "Ballman " + i;
+            var t = randomTiles.Dequeue();
+            ballmen[t] = b;
+            b.MoveToTile(t);
+        }
     }
 
     public void SetBallmanPosition(Ballman b, Tile oldTile, Tile newTile)
@@ -88,17 +114,13 @@ public class Court : MonoBehaviour
 
     private void Awake()
     {
-        Generate();
-    }
-
-    private void Generate()
-    {
+        ballmen = new Dictionary<Tile, Ballman>();
         tiles = new Tile[(xSize + 1) * (ySize + 1)];
         for (int i = 0, y = 0; y <= ySize; y++)
         {
             for (int x = 0; x <= xSize; x++, i++)
             {
-                tiles[i] = Instantiate(basicTile, transform);
+                tiles[i] = Instantiate(tileTemplate, transform);
                 tiles[i].SetupTile(x, y, xSize, ySize);
                 tiles[i].mouseOverEvent += MouseOver;
             }
