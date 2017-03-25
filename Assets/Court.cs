@@ -1,17 +1,32 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class TileGenerator : MonoBehaviour
+public class Court : MonoBehaviour
 {
     public int xSize, ySize;
     public Tile basicTile;
-    private Tile[] tiles;
+    public Tile[] tiles;
     private Tile over;
     private Tile selected;
+    private Dictionary<Tile, Ballman> ballmen;
 
-    void Start()
+    private void Start()
     {
+        ballmen = new Dictionary<Tile, Ballman>();
+    }
+
+    public void SetBallmanPosition(Ballman b, Tile oldTile, Tile newTile)
+    {
+        if (ballmen.ContainsKey(newTile))
+        {
+            throw new Exception("COLLISION DETECTION OMG AAA GAMEDEV31337!111");
+        }
+        if (oldTile)
+        {
+            ballmen.Remove(oldTile);
+        }
+        ballmen.Add(newTile, b);
     }
 
     void Update()
@@ -21,20 +36,28 @@ public class TileGenerator : MonoBehaviour
         {
             if (!selected && over)
             {
-                selected = over;
-                Debug.Log("Selected " + selected.name);
-                selected.SetSelected(true);
+                Ballman ballman;
+                if (ballmen.TryGetValue(over, out ballman))
+                {
+                    selected = over;
+                    selected.SetSelected(true);
+                }
             }
             else if (selected && !over)
             {
-                Debug.Log("Unselecting " + selected.name);
                 ChangeHighlights(false);
                 selected.SetSelected(false);
                 selected = null;
             }
             else if (selected && over)
             {
-                Debug.Log("Started from " + selected.name + " going to " + over.name);
+                Ballman ballman;
+                if(ballmen.TryGetValue(selected, out ballman))
+                {
+                    ChangeHighlights(false);
+                    ballman.MoveToTile(over);
+                    selected = null;
+                }
             }
         }
 
