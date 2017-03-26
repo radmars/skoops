@@ -106,7 +106,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &206647239
 Transform:
   m_ObjectHideFlags: 0
@@ -244,6 +244,7 @@ GameObject:
   - component: {fileID: 1085355733}
   - component: {fileID: 1085355732}
   - component: {fileID: 1085355737}
+  - component: {fileID: 1085355738}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -333,6 +334,14 @@ MonoBehaviour:
   colorPrecision: 32
   usePalette: 0
   palette: {fileID: 0}
+--- !u!45 &1085355738
+Skybox:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1085355731}
+  m_Enabled: 1
+  m_CustomSkybox: {fileID: 2100000, guid: 9ec8aaefa4d9bfc469017cafcac107c4, type: 2}
 --- !u!1 &1154224331
 GameObject:
   m_ObjectHideFlags: 0
