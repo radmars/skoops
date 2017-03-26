@@ -106,7 +106,7 @@ public class Court : MonoBehaviour
                 var yd = selected.Y - y;
                 yd = yd * yd;
                 Color c = Color.green;
-                c.g *= 1 - Mathf.Clamp01(Mathf.Sqrt(xd + yd) / 10);
+                c.g *= 1 - Mathf.Clamp01(Mathf.Sqrt(xd + yd) / 4);
                 tiles[i].Highlight(on, c);
             }
         }
