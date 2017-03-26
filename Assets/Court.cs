@@ -13,6 +13,7 @@ public class Court : MonoBehaviour
     private Tile selected;
     private Dictionary<Tile, Ballman> ballmen;
     public GameObject selector;
+    public GameObject tileMarker;
 
     public static IList<T> Shuffle<T>(IList<T> list)
     {
@@ -95,6 +96,17 @@ public class Court : MonoBehaviour
                     selected = null;
                 }
             }
+        }
+
+        if(over)
+        {
+            tileMarker.SetActive(true);
+            tileMarker.transform.position = over.transform.position;
+            tileMarker.transform.position += new Vector3(0, .05f, 0);
+        }
+        else
+        {
+            tileMarker.SetActive(true);
         }
         ChangeHighlights(false);
 
