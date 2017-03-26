@@ -6,6 +6,19 @@ using UnityEngine;
 public class Ballman : MonoBehaviour {
     public Tile currentTile;
     public float speed = 3.0f;
+    public int team;
+
+    public void SetTeam(int t)
+    {
+        if(t == 0)
+        {
+            transform.Rotate(new Vector3(0, 90, 0), Space.Self);
+        }
+        if (t == 1)
+        {
+            transform.Rotate(new Vector3(0, -90, 0), Space.Self);
+        }
+    }
 
     public void MoveToTile(Tile t)
     {
@@ -18,7 +31,6 @@ public class Ballman : MonoBehaviour {
         var wffu = new WaitForFixedUpdate();
         Vector3 beginPosition = transform.position;
         Vector3 endPosition = tile.transform.position;
-        endPosition += new Vector3(0, 1, 0);
         Vector3 direction = (endPosition - beginPosition).normalized;
 
         float beginTime = Time.time;

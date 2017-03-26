@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Court : MonoBehaviour
@@ -29,16 +30,25 @@ public class Court : MonoBehaviour
 
     private void Start()
     {
-        var randomTiles = new Queue<Tile>(Shuffle(new List<Tile>(tiles)));
-
-        for(var i = 0; i < 5; i ++)
+        for (var team = 0; team <= 1; team++)
         {
-            var b = Instantiate(ballmanTemplate);
-            b.gameObject.SetActive(true);
-            b.name = "Ballman " + i;
-            var t = randomTiles.Dequeue();
-            ballmen[t] = b;
-            b.MoveToTile(t);
+            var randomTiles = new Queue<Tile>(
+                Shuffle(
+                    tiles.Where(
+                        (tile) => (int)((tile.X-1) / (xSize / 2.0)) == team
+                    ).ToList()
+                )
+            );
+            for (var i = 0; i < 5; i++)
+            {
+                var b = Instantiate(ballmanTemplate);
+                b.gameObject.SetActive(true);
+                b.name = "Ballman " + i;
+                var t = randomTiles.Dequeue();
+                ballmen[t] = b;
+                b.MoveToTile(t);
+                b.SetTeam(team);
+            }
         }
     }
 
