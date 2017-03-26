@@ -12,6 +12,7 @@ public class Court : MonoBehaviour
     private Tile over;
     private Tile selected;
     private Dictionary<Tile, Ballman> ballmen;
+    public GameObject selector;
 
     public static IList<T> Shuffle<T>(IList<T> list)
     {
@@ -30,6 +31,7 @@ public class Court : MonoBehaviour
 
     private void Start()
     {
+        selector.SetActive(false);
         for (var team = 0; team <= 1; team++)
         {
             var randomTiles = new Queue<Tile>(
@@ -76,13 +78,11 @@ public class Court : MonoBehaviour
                 if (ballmen.TryGetValue(over, out ballman))
                 {
                     selected = over;
-                    selected.SetSelected(true);
                 }
             }
             else if (selected && !over)
             {
                 ChangeHighlights(false);
-                selected.SetSelected(false);
                 selected = null;
             }
             else if (selected && over)
@@ -90,35 +90,28 @@ public class Court : MonoBehaviour
                 Ballman ballman;
                 if(ballmen.TryGetValue(selected, out ballman))
                 {
-                    ChangeHighlights(false);
                     ballman.MoveToTile(over);
+                    SetBallmanPosition(ballman, selected, over);
                     selected = null;
                 }
             }
         }
-
-        if(selected)
-        {
-            ChangeHighlights(true);
-        }
+        ChangeHighlights(false);
 
         over = null;
     }
 
     private void ChangeHighlights(bool on)
     {
-        for (int i = 0, y = 0; y <= ySize; y++)
+        if(selected)
         {
-            for (int x = 0; x <= xSize; x++, i++)
-            {
-                var xd = selected.X - x;
-                xd = xd * xd;
-                var yd = selected.Y - y;
-                yd = yd * yd;
-                Color c = Color.green;
-                c.g *= 1 - Mathf.Clamp01(Mathf.Sqrt(xd + yd) / 4);
-                tiles[i].Highlight(on, c);
-            }
+            selector.transform.position =
+                selected.transform.position;
+            selector.SetActive(true);
+        }
+        else
+        {
+            selector.SetActive(false);
         }
     }
 

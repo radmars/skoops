@@ -23,20 +23,6 @@ public class Tile : MonoBehaviour
     private void OnMouseExit()
     {
         hovered = false;
-        material.color = Color.white;
-    }
-
-    public void SetSelected(bool selected)
-    {
-
-    }
-
-    public void Highlight(bool on, Color c)
-    {
-        if (!hovered)
-        {
-            material.color = on ? c : Color.white;
-        }
     }
 
     // Update is called once per frame
