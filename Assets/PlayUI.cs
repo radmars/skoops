@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoveUI : MonoBehaviour
+public class PlayUI : MonoBehaviour
 {
     public Court court;
     private bool showGUI;
@@ -17,8 +17,9 @@ public class MoveUI : MonoBehaviour
         }
     }
 
-    private void RunMove(Ballman bm, string play)
+    private void RunPlay(Ballman bm, string play)
     {
+        bm.RunPlay(play);
         Debug.Log(bm.name + " running play " + play);
         court.SelectorEnabled = true;
         showGUI = false;
@@ -35,14 +36,13 @@ public class MoveUI : MonoBehaviour
     {
         if (!showGUI)
             return;
-        Debug.Log("no rly");
         var buttons = new string[]{ "shoot", "dunk", "layup", "pass" };
         var position = new Rect(Screen.width/ 2f - 40, Screen.height / 2f - buttons.Length *  15, 80, 30);
         foreach( var b in buttons)
         {
             if (GUI.Button(position, b))
             {
-                RunMove(currentBallman, b);
+                RunPlay(currentBallman, b);
             }
             position.position += new Vector2(0, 30);
         }

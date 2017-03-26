@@ -61,6 +61,16 @@ public class Court : MonoBehaviour
         ballmen.Add(newTile, b);
     }
 
+    void OnMoveFinished(Ballman man)
+    {
+        selected = null;
+    }
+
+    void OnPlayFinished(Ballman man, string move)
+    {
+        selector.SetActive(false);
+    }
+
     void Update()
     {
         if (selectorEnabled)
@@ -74,20 +84,30 @@ public class Court : MonoBehaviour
                     if (ballmen.TryGetValue(over, out ballman))
                     {
                         selected = over;
+                        selector.transform.parent = ballman.transform;
+                        selector.transform.position = ballman.transform.position;
+                        selector.SetActive(true);
                     }
                 }
                 else if (selected && !over)
                 {
                     selected = null;
+                    selector.SetActive(false);
                 }
                 else if (selected && over)
                 {
                     Ballman ballman;
                     if (ballmen.TryGetValue(selected, out ballman))
                     {
-                        ballman.MoveToTile(over, true);
-                        SetBallmanPosition(ballman, selected, over);
-                        selected = null;
+                        if(!ballmen.ContainsKey(over))
+                        {
+                            ballman.MoveToTile(over, true);
+                            SetBallmanPosition(ballman, selected, over);
+                        }
+                        else
+                        {
+                            // already someone there.
+                        }
                     }
                 }
             }
@@ -103,23 +123,8 @@ public class Court : MonoBehaviour
         {
             tileMarker.SetActive(true);
         }
-        ChangeHighlights();
 
         over = null;
-    }
-
-    private void ChangeHighlights()
-    {
-        if (selected)
-        {
-            selector.transform.position =
-                selected.transform.position;
-            selector.SetActive(true);
-        }
-        else
-        {
-            selector.SetActive(false);
-        }
     }
 
     private void Awake()
@@ -155,6 +160,8 @@ public class Court : MonoBehaviour
                 ballmen[t] = b;
                 b.MoveToTile(t, false);
                 b.SetTeam(team);
+                b.onMoveFinished += OnMoveFinished;
+                b.onPlayFinished += OnPlayFinished;
             }
         }
 
