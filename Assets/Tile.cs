@@ -11,18 +11,11 @@ public class Tile : MonoBehaviour
     public MouseOverTile mouseOverEvent;
     private Material material;
 
-    private bool hovered = false;
 
     private void OnMouseOver()
     {
-        hovered = true;
         material.color = Color.red;
         mouseOverEvent(this);
-    }
-
-    private void OnMouseExit()
-    {
-        hovered = false;
     }
 
     // Update is called once per frame

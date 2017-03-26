@@ -8,6 +8,10 @@ public class Ballman : MonoBehaviour {
     public float speed = 3.0f;
     public int team;
 
+    public delegate void MoveListener(Ballman m);
+
+    public event MoveListener onMoveFinished;
+
     public void SetTeam(int t)
     {
         if(t == 0)
@@ -20,13 +24,13 @@ public class Ballman : MonoBehaviour {
         }
     }
 
-    public void MoveToTile(Tile t)
+    public void MoveToTile(Tile t, bool asMove)
     {
         this.currentTile = t;
-        StartCoroutine(AnimateMoveToTile(t));
+        StartCoroutine(AnimateMoveToTile(t, asMove));
     }
 
-    private IEnumerator AnimateMoveToTile(Tile tile)
+    private IEnumerator AnimateMoveToTile(Tile tile, bool asMove)
     {
         var wffu = new WaitForFixedUpdate();
         Vector3 beginPosition = transform.position;
@@ -44,5 +48,11 @@ public class Ballman : MonoBehaviour {
         }
 
         transform.position = endPosition;
+
+        if (onMoveFinished != null && asMove)
+        {
+            Debug.Log("Moved");
+            onMoveFinished(this);
+        }
     }
 }
