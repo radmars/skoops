@@ -2,15 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayUI : MonoBehaviour
 {
     public Court court;
-    private bool showGUI;
     private Ballman currentBallman;
+    public Button buttonTemplate;
+    public Canvas canvas;
+    public List<Button> buttons;
 
     void Start()
     {
+        buttons = new List<Button>();
         foreach(var b in court.GetBallmen())
         {
             b.onMoveFinished += ShowMoveButtons;
@@ -22,30 +26,29 @@ public class PlayUI : MonoBehaviour
         bm.RunPlay(play);
         Debug.Log(bm.name + " running play " + play);
         court.SelectorEnabled = true;
-        showGUI = false;
+        buttons.ForEach((b) => Destroy(b.gameObject));
+        buttons.Clear();
     }
 
     private void ShowMoveButtons(Ballman bm)
     {
-        showGUI = true;
         court.SelectorEnabled = false;
         currentBallman = bm;
-    }
 
-    private void OnGUI()
-    {
-        if (!showGUI)
-            return;
-        var buttons = new string[]{ "shoot", "dunk", "layup", "pass" };
-        var position = new Rect(Screen.width/ 2f - 40, Screen.height / 2f - buttons.Length *  15, 80, 30);
-        foreach( var b in buttons)
+        var buttonText = new string[]{ "shoot", "dunk", "layup", "pass" };
+        var position = new Vector2(Screen.width / 2f - 40, Screen.height / 2f - buttonText.Length * 15);
+        foreach ( var b in buttonText)
         {
-            if (GUI.Button(position, b))
+            var newButton = Instantiate(buttonTemplate, canvas.transform);
+            newButton.GetComponentInChildren<Text>().text = b;
+            newButton.gameObject.SetActive(true);
+            newButton.onClick.AddListener(() =>
             {
                 RunPlay(currentBallman, b);
-            }
-            position.position += new Vector2(0, 30);
+            });
+            newButton.transform.position = position;
+            position += new Vector2(0, 30);
+            buttons.Add(newButton);
         }
-
     }
 }
