@@ -13,15 +13,31 @@ public class Ballman : MonoBehaviour {
     public delegate void PlayListener(Ballman m, string play);
     public delegate void MoveListener(Ballman m);
 
-    public event MoveListener onMoveFinished;
-    public event PlayListener onPlayFinished;
+    public event MoveListener OnMoveFinished;
+    public event PlayListener OnPlayFinished;
+    private bool hasBall;
 
-    public void Start()
+    public void Awake()
     {
         animator = GetComponentInChildren<Animator>();
-        animator.Play("idle_no_ball");
         ball = transform.FindChild("basket_ball_boy/ball").gameObject;
-        ball.SetActive(false);
+        HasBall(false);
+    }
+
+    public string[] GetPlays()
+    {
+        return new string[]{ "shoot", "bounce_pass", "chest_pass" };
+    }
+
+    public void HasBall(bool b)
+    {
+        hasBall = b;
+        if (b)
+        {
+            Debug.Log(name);
+        }
+        ball.SetActive(hasBall);
+        animator.SetBool("has_ball", hasBall);
     }
 
     public void SetTeam(int t)
@@ -37,9 +53,10 @@ public class Ballman : MonoBehaviour {
     }
     public void RunPlay(string play)
     {
-        if (onPlayFinished != null)
+        if (OnPlayFinished != null)
         {
-            onPlayFinished(this, play);
+            animator.SetTrigger(play);
+            OnPlayFinished(this, play);
         }
     }
 
@@ -71,10 +88,10 @@ public class Ballman : MonoBehaviour {
 
         transform.position = endPosition;
 
-        if (onMoveFinished != null && asMove)
+        if (OnMoveFinished != null && asMove)
         {
             Debug.Log("Moved");
-            onMoveFinished(this);
+            OnMoveFinished(this);
         }
     }
 }

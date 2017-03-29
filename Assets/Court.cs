@@ -46,6 +46,7 @@ public class Court : MonoBehaviour
 
     private void Start()
     {
+        ballmen[ballmen.Keys.First()].HasBall(true);
     }
 
     public void SetBallmanPosition(Ballman b, Tile oldTile, Tile newTile)
@@ -160,8 +161,8 @@ public class Court : MonoBehaviour
                 ballmen[t] = b;
                 b.MoveToTile(t, false);
                 b.SetTeam(team);
-                b.onMoveFinished += OnMoveFinished;
-                b.onPlayFinished += OnPlayFinished;
+                b.OnMoveFinished += OnMoveFinished;
+                b.OnPlayFinished += OnPlayFinished;
             }
         }
 

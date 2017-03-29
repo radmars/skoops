@@ -17,7 +17,7 @@ public class PlayUI : MonoBehaviour
         buttons = new List<Button>();
         foreach(var b in court.GetBallmen())
         {
-            b.onMoveFinished += ShowMoveButtons;
+            b.OnMoveFinished += ShowMoveButtons;
         }
     }
 
@@ -35,7 +35,7 @@ public class PlayUI : MonoBehaviour
         court.SelectorEnabled = false;
         currentBallman = bm;
 
-        var buttonText = new string[]{ "shoot", "dunk", "layup", "pass" };
+        var buttonText = bm.GetPlays();
         var position = new Vector2(Screen.width / 2f - 40, Screen.height / 2f - buttonText.Length * 15);
         foreach ( var b in buttonText)
         {
