@@ -6,7 +6,7 @@ using UnityEngine;
 public class Ballman : MonoBehaviour {
     public Tile currentTile;
     public float speed = 3.0f;
-    public int team;
+    public Team team;
     private Animator animator;
     private GameObject ball;
 
@@ -21,36 +21,53 @@ public class Ballman : MonoBehaviour {
     {
         animator = GetComponentInChildren<Animator>();
         ball = transform.FindChild("basket_ball_boy/ball").gameObject;
-        HasBall(false);
+        HasBall = false;
     }
 
     public string[] GetPlays()
     {
-        return new string[]{ "shoot", "bounce_pass", "chest_pass" };
+        if (HasBall)
+        {
+            return new string[] { "shoot", "bounce_pass", "chest_pass" };
+        }
+        else if (team.HasBall)
+        {
+            return new string[] { "pick", "spin", "step out", "wait" };
+        }
+        else
+        {
+            return new string[] { "guard_low", "guard_high", "reach" };
+        }
     }
 
-    public void HasBall(bool b)
+    public bool HasBall
     {
-        hasBall = b;
-        if (b)
+        set
         {
-            Debug.Log(name);
+            Debug.Log("Hash ball" + value);
+            hasBall = value;
+            animator.SetBool("has_ball", value);
+            ball.SetActive(hasBall);
         }
-        ball.SetActive(hasBall);
-        animator.SetBool("has_ball", hasBall);
+        get
+        {
+            return hasBall;
+        }
     }
 
-    public void SetTeam(int t)
+    public Team Team
     {
-        if(t == 0)
+        set
         {
-            transform.Rotate(new Vector3(0, 90, 0), Space.Self);
+            team = value;
+            transform.Rotate(new Vector3(0, team.Rotation, 0), Space.Self);
         }
-        if (t == 1)
+        get
         {
-            transform.Rotate(new Vector3(0, -90, 0), Space.Self);
+            return team;
         }
     }
+
     public void RunPlay(string play)
     {
         if (OnPlayFinished != null)
@@ -77,8 +94,6 @@ public class Ballman : MonoBehaviour {
         float endTime = beginTime + Vector3.Distance(beginPosition, endPosition) / speed;
         var duration = endTime - beginTime;
         yield return wffu;
-
-        animator.Play("run_dribble");
 
         for (var t = Time.time - beginTime; t < duration; t = Time.time - beginTime)
         {

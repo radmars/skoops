@@ -3,6 +3,45 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+public class Team
+{
+    private List<Ballman> ballmen;
+    private bool right;
+
+    public Team()
+    {
+        ballmen = new List<Ballman>();
+    }
+
+    public IList<Ballman> Ballmen
+    {
+        get { return ballmen; }
+        private set { }
+    }
+
+    public bool RightToLeft
+    {
+        get
+        {
+            return right;
+        }
+        set
+        {
+            right = value;
+        }
+    } 
+
+    public int Rotation
+    {
+        get
+        {
+            return RightToLeft ? -90 : 90;
+        }
+    }
+
+    public bool HasBall { get; internal set; }
+}
+
 public class Court : MonoBehaviour
 {
     public int xSize, ySize;
@@ -11,6 +50,8 @@ public class Court : MonoBehaviour
     public Ballman ballmanTemplate;
     private Tile over;
 
+    private Team teamOne = new Team();
+    private Team teamTwo = new Team();
 
     private Tile selected;
     private Dictionary<Tile, Ballman> ballmen;
@@ -39,14 +80,18 @@ public class Court : MonoBehaviour
         set { selectorEnabled = value; }
     }
 
-    internal IEnumerable<Ballman> GetBallmen()
+    public Ballman BallHolder { get; internal set; }
+
+    public IEnumerable<Ballman> GetBallmen()
     {
         return ballmen.Values;
     }
 
-    private void Start()
+    public void Start()
     {
-        ballmen[ballmen.Keys.First()].HasBall(true);
+        var b = ballmen[ballmen.Keys.First()];
+        b.HasBall = true;
+        b.Team.HasBall = true;
     }
 
     public void SetBallmanPosition(Ballman b, Tile oldTile, Tile newTile)
@@ -128,7 +173,7 @@ public class Court : MonoBehaviour
         over = null;
     }
 
-    private void Awake()
+    public void Awake()
     {
         ballmen = new Dictionary<Tile, Ballman>();
         tiles = new Tile[(xSize + 1) * (ySize + 1)];
@@ -143,12 +188,14 @@ public class Court : MonoBehaviour
         }
         SelectorEnabled = true;
         selector.SetActive(false);
-        for (var team = 0; team <= 1; team++)
+        teamTwo.RightToLeft = true;
+
+        foreach (var team in new Team[] { teamOne, teamTwo })
         {
             var randomTiles = new Queue<Tile>(
                 Shuffle(
                     tiles.Where(
-                        (tile) => (int)((tile.X - 1) / (xSize / 2.0)) == team
+                        (tile) => (int)((tile.X - 1) / (xSize / 2.0)) == (team.RightToLeft ? 1 : 0)
                     ).ToList()
                 )
             );
@@ -160,12 +207,12 @@ public class Court : MonoBehaviour
                 var t = randomTiles.Dequeue();
                 ballmen[t] = b;
                 b.MoveToTile(t, false);
-                b.SetTeam(team);
+                b.Team = team;
+                team.Ballmen.Add(b);
                 b.OnMoveFinished += OnMoveFinished;
                 b.OnPlayFinished += OnPlayFinished;
             }
         }
-
     }
 
     private void MouseOver(Tile t)

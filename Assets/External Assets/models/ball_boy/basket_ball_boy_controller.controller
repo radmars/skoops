@@ -135,6 +135,30 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!1101 &1101191595852117122
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: 
+  m_Conditions:
+  - m_ConditionMode: 1
+    m_ConditionEvent: has_ball
+    m_EventTreshold: 0
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: 1102085084570285874}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 3
+  m_TransitionDuration: 0.25
+  m_TransitionOffset: 0
+  m_ExitTime: 0.85000014
+  m_HasExitTime: 0
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 0
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 1
 --- !u!1101 &1101209722277693284
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -399,7 +423,10 @@ AnimatorStateTransition:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: 
-  m_Conditions: []
+  m_Conditions:
+  - m_ConditionMode: 1
+    m_ConditionEvent: bounce_pass
+    m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 1102714731097818304}
   m_Solo: 0
@@ -643,6 +670,7 @@ AnimatorState:
   - {fileID: 1101545584576682766}
   - {fileID: 1101153699894812558}
   - {fileID: 1101709495269711534}
+  - {fileID: 1101191595852117122}
   m_StateMachineBehaviours: []
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
@@ -738,7 +766,7 @@ AnimatorStateMachine:
   m_ChildStates:
   - serializedVersion: 1
     m_State: {fileID: 1102085084570285874}
-    m_Position: {x: 576, y: 312, z: 0}
+    m_Position: {x: 552, y: 300, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 1102714731097818304}
     m_Position: {x: 72, y: 300, z: 0}
@@ -759,7 +787,7 @@ AnimatorStateMachine:
     m_Position: {x: 180, y: 36, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 1102041612054271296}
-    m_Position: {x: 408, y: 204, z: 0}
+    m_Position: {x: 636, y: 468, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 1102567274002285384}
     m_Position: {x: 444, y: -96, z: 0}
