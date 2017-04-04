@@ -3,45 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Team
-{
-    private List<Ballman> ballmen;
-    private bool right;
-
-    public Team()
-    {
-        ballmen = new List<Ballman>();
-    }
-
-    public IList<Ballman> Ballmen
-    {
-        get { return ballmen; }
-        private set { }
-    }
-
-    public bool RightToLeft
-    {
-        get
-        {
-            return right;
-        }
-        set
-        {
-            right = value;
-        }
-    } 
-
-    public int Rotation
-    {
-        get
-        {
-            return RightToLeft ? -90 : 90;
-        }
-    }
-
-    public bool HasBall { get; internal set; }
-}
-
 public class Court : MonoBehaviour
 {
     public int xSize, ySize;
@@ -52,12 +13,11 @@ public class Court : MonoBehaviour
 
     private Team teamOne = new Team();
     private Team teamTwo = new Team();
-
-    private Tile selected;
     private Dictionary<Tile, Ballman> ballmen;
+    public ITileSelector TileSelector { get; set; }
+
     public GameObject selector;
     public GameObject tileMarker;
-    private bool selectorEnabled;
 
     public static IList<T> Shuffle<T>(IList<T> list)
     {
@@ -73,14 +33,6 @@ public class Court : MonoBehaviour
         }
         return list;
     }
-
-    internal bool SelectorEnabled
-    {
-        get { return selectorEnabled; }
-        set { selectorEnabled = value; }
-    }
-
-    public Ballman BallHolder { get; internal set; }
 
     public IEnumerable<Ballman> GetBallmen()
     {
@@ -107,55 +59,25 @@ public class Court : MonoBehaviour
         ballmen.Add(newTile, b);
     }
 
-    void OnMoveFinished(Ballman man)
-    {
-        selected = null;
-    }
-
     void OnPlayFinished(Ballman man, string move)
     {
         selector.SetActive(false);
     }
 
+    public Ballman GetBallmanAt(Tile tile)
+    {
+        Ballman outman;
+        ballmen.TryGetValue(tile, out outman);
+        return outman;
+    }
+
+    // TODO: Move to play ui
     void Update()
     {
-        if (selectorEnabled)
+        if (TileSelector != null)
         {
-            var click = Input.GetMouseButtonUp(0);
-            if (click)
-            {
-                if (!selected && over)
-                {
-                    Ballman ballman;
-                    if (ballmen.TryGetValue(over, out ballman))
-                    {
-                        selected = over;
-                        selector.transform.parent = ballman.transform;
-                        selector.transform.position = ballman.transform.position;
-                        selector.SetActive(true);
-                    }
-                }
-                else if (selected && !over)
-                {
-                    selected = null;
-                    selector.SetActive(false);
-                }
-                else if (selected && over)
-                {
-                    Ballman ballman;
-                    if (ballmen.TryGetValue(selected, out ballman))
-                    {
-                        if(!ballmen.ContainsKey(over))
-                        {
-                            ballman.MoveToTile(over, true);
-                            SetBallmanPosition(ballman, selected, over);
-                        }
-                        else
-                        {
-                            // already someone there.
-                        }
-                    }
-                }
+            if (Input.GetMouseButtonUp(0)) {
+                TileSelector.Select(this, over, selector);
             }
         }
 
@@ -186,7 +108,6 @@ public class Court : MonoBehaviour
                 tiles[i].mouseOverEvent += MouseOver;
             }
         }
-        SelectorEnabled = true;
         selector.SetActive(false);
         teamTwo.RightToLeft = true;
 
@@ -209,7 +130,6 @@ public class Court : MonoBehaviour
                 b.MoveToTile(t, false);
                 b.Team = team;
                 team.Ballmen.Add(b);
-                b.OnMoveFinished += OnMoveFinished;
                 b.OnPlayFinished += OnPlayFinished;
             }
         }

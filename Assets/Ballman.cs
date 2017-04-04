@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Ballman : MonoBehaviour {
     public Tile currentTile;
     public float speed = 3.0f;
-    public Team team;
+    private Team team;
     private Animator animator;
     private GameObject ball;
 
@@ -17,6 +16,18 @@ public class Ballman : MonoBehaviour {
     public event PlayListener OnPlayFinished;
     private bool hasBall;
 
+    static Dictionary<string, IPlay> playBook = new Dictionary<string, IPlay>();
+    static Ballman()
+    {
+        foreach(var p in new IPlay[]
+        {
+            new Pass()
+        })
+        {
+            playBook.Add(p.GetName(), p);
+        }
+    }
+
     public void Awake()
     {
         animator = GetComponentInChildren<Animator>();
@@ -24,27 +35,15 @@ public class Ballman : MonoBehaviour {
         HasBall = false;
     }
 
-    public string[] GetPlays()
+    public IPlay[] GetPlays()
     {
-        if (HasBall)
-        {
-            return new string[] { "shoot", "bounce_pass", "chest_pass" };
-        }
-        else if (team.HasBall)
-        {
-            return new string[] { "pick", "spin", "step out", "wait" };
-        }
-        else
-        {
-            return new string[] { "guard_low", "guard_high", "reach" };
-        }
+        return new IPlay[] { playBook["pass"] };
     }
 
     public bool HasBall
     {
         set
         {
-            Debug.Log("Hash ball" + value);
             hasBall = value;
             animator.SetBool("has_ball", value);
             ball.SetActive(hasBall);
@@ -105,7 +104,6 @@ public class Ballman : MonoBehaviour {
 
         if (OnMoveFinished != null && asMove)
         {
-            Debug.Log("Moved");
             OnMoveFinished(this);
         }
     }
