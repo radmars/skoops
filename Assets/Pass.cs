@@ -1,6 +1,4 @@
-﻿using System;
-
-class Pass : IPlay
+﻿class Pass : IPlay
 {
     private string PassType
     {
@@ -16,7 +14,7 @@ class Pass : IPlay
         player.RunPlay(PassType);
 
         target.HasBall = true;
-        target.RunPlay("catch_pass_to_dribble");
+        target.RunPlay("catch_pass");
     }
 
     public string GetName()

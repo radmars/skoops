@@ -4,97 +4,68 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public delegate void TileSelected(Tile t);
-
-public interface ITileSelector
+public class TurnOrder
 {
-    event TileSelected OnSelected;
-    void Select(Court c, Tile tile, GameObject selector);
-}
+    public int CurrentTurnIndex { get; private set; }
+    public int CurrentRound { get; private set; }
 
-class BasicTileSelector : ITileSelector
-{
-    Tile selected;
-    public event TileSelected OnSelected;
+    private List<Ballman> Turns = new List<Ballman>();
 
-    public void Select(Court c, Tile tile, GameObject selector)
+    public TurnOrder(Team one, Team two)
     {
-        if(!selected && tile)
-        {
-            var ballman = c.GetBallmanAt(tile);
-            if(ballman)
-            {
-                selected = tile;
-                selector.transform.parent = ballman.transform;
-                selector.transform.position = ballman.transform.position;
-                selector.SetActive(true);
-            }
-        }
-        else if(selected && !tile)
-        {
-            selected = null;
-            selector.SetActive(false);
-        }
-        else if(selected && tile)
-        {
-            var ballman = c.GetBallmanAt(selected);
-            if (ballman)
-            {
-                if (!c.GetBallmanAt(tile))
-                {
-                    ballman.MoveToTile(tile, true);
-                    c.SetBallmanPosition(ballman, selected, tile);
-                    selected = null;
-                }
-                else
-                {
-                    // already someone there.
-                }
-            }
-        }
-    }
-}
-
-class TeamTileSelector : ITileSelector
-{
-    public event TileSelected OnSelected;
-    private Team team;
-
-    public TeamTileSelector(Team t)
-    {
-        team = t;
+        CurrentTurnIndex = 0;
+        CurrentRound = 0;
+        Turns.AddRange(one.Ballmen);
+        Turns.AddRange(two.Ballmen);
+        Turns.Shuffle();
     }
 
-    public void Select(Court c, Tile tile, GameObject selector)
+    public Ballman CurrentTurn()
     {
-        if (tile)
+        return Turns[CurrentTurnIndex];
+    }
+
+    public void FinishTurn()
+    {
+        CurrentTurnIndex++;
+        if(CurrentTurnIndex >= Turns.Count)
         {
-            var b = c.GetBallmanAt(tile);
-            if (b && b.Team == team)
-            {
-                OnSelected(tile);
-            }
+            CurrentTurnIndex = 0;
+            CurrentRound++;
         }
     }
 }
 
 public class PlayUI : MonoBehaviour
 {
+    public GameObject selectedBallmanMarker;
     public Court court;
-    private Ballman currentBallman;
     public Button buttonTemplate;
     public Canvas canvas;
-    public List<Button> buttons;
-    private BasicTileSelector basicSelector = new BasicTileSelector();
+
+    private BasicTileSelector basicSelector;
+    private TurnOrder turnOrder;
+
 
     void Start()
     {
-        buttons = new List<Button>();
+        turnOrder = new TurnOrder(court.TeamOne, court.TeamTwo);
         foreach(var b in court.GetBallmen())
         {
             b.OnMoveFinished += ShowMoveButtons;
         }
+        basicSelector = new BasicTileSelector(turnOrder);
         court.TileSelector = basicSelector;
+        selectedBallmanMarker.SetActive(false);
+        UpdateSelectedPlayer();
+    }
+
+    void UpdateSelectedPlayer()
+    {
+        var currentBallman = turnOrder.CurrentTurn();
+        selectedBallmanMarker.transform.parent = currentBallman.transform;
+        selectedBallmanMarker.transform.position = currentBallman.transform.position;
+        selectedBallmanMarker.SetActive(true);
     }
 
     private void RunPlay(IPlay play, Ballman player, Ballman target)
@@ -106,7 +77,8 @@ public class PlayUI : MonoBehaviour
     private void ShowMoveButtons(Ballman bm)
     {
         court.TileSelector = null;
-        currentBallman = bm;
+        var currentBallman = bm;
+        var buttons = new List<Button>();
 
         var plays = bm.GetPlays();
         var position = new Vector2(Screen.width / 2f - 40, Screen.height / 2f - plays.Length * 15);
@@ -117,10 +89,8 @@ public class PlayUI : MonoBehaviour
             newButton.gameObject.SetActive(true);
             newButton.onClick.AddListener(() =>
             {
-
                 buttons.ForEach((b) => Destroy(b.gameObject));
                 buttons.Clear();
-
                 var selector = play.GetTargetSelector(bm);
                 if (selector != null)
                 {
@@ -129,6 +99,8 @@ public class PlayUI : MonoBehaviour
                     selector.OnSelected += (selected) =>
                     {
                         RunPlay(play, currentBallman, court.GetBallmanAt(selected));
+                        turnOrder.FinishTurn();
+                        UpdateSelectedPlayer();
                     };
                 }
                 else

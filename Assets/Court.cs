@@ -9,30 +9,16 @@ public class Court : MonoBehaviour
     public Tile tileTemplate;
     public Tile[] tiles;
     public Ballman ballmanTemplate;
-    private Tile over;
-
-    private Team teamOne = new Team();
-    private Team teamTwo = new Team();
-    private Dictionary<Tile, Ballman> ballmen;
+   
     public ITileSelector TileSelector { get; set; }
 
-    public GameObject selector;
     public GameObject tileMarker;
 
-    public static IList<T> Shuffle<T>(IList<T> list)
-    {
-        var rng = new System.Random();
-        int n = list.Count;
-        while (n > 1)
-        {
-            n--;
-            int k = rng.Next(n + 1);
-            T value = list[k];
-            list[k] = list[n];
-            list[n] = value;
-        }
-        return list;
-    }
+    public Team TeamOne { get; private set; }
+    public Team TeamTwo { get; private set; }
+
+    private Tile over;
+    private Dictionary<Tile, Ballman> ballmen;
 
     public IEnumerable<Ballman> GetBallmen()
     {
@@ -43,25 +29,20 @@ public class Court : MonoBehaviour
     {
         var b = ballmen[ballmen.Keys.First()];
         b.HasBall = true;
-        b.Team.HasBall = true;
     }
 
-    public void SetBallmanPosition(Ballman b, Tile oldTile, Tile newTile)
+    public void SetBallmanPosition(Ballman b, Tile newTile)
     {
         if (ballmen.ContainsKey(newTile))
         {
             throw new Exception("COLLISION DETECTION OMG AAA GAMEDEV31337!111");
         }
+        var oldTile = ballmen.First(pair => pair.Value == b).Key;
         if (oldTile)
         {
             ballmen.Remove(oldTile);
         }
         ballmen.Add(newTile, b);
-    }
-
-    void OnPlayFinished(Ballman man, string move)
-    {
-        selector.SetActive(false);
     }
 
     public Ballman GetBallmanAt(Tile tile)
@@ -77,7 +58,7 @@ public class Court : MonoBehaviour
         if (TileSelector != null)
         {
             if (Input.GetMouseButtonUp(0)) {
-                TileSelector.Select(this, over, selector);
+                TileSelector.Select(this, over);
             }
         }
 
@@ -97,6 +78,8 @@ public class Court : MonoBehaviour
 
     public void Awake()
     {
+        TeamOne = new Team("red");
+        TeamTwo = new Team("blue");
         ballmen = new Dictionary<Tile, Ballman>();
         tiles = new Tile[(xSize + 1) * (ySize + 1)];
         for (int i = 0, y = 0; y <= ySize; y++)
@@ -108,31 +91,32 @@ public class Court : MonoBehaviour
                 tiles[i].mouseOverEvent += MouseOver;
             }
         }
-        selector.SetActive(false);
-        teamTwo.RightToLeft = true;
+        TeamTwo.RightToLeft = true;
 
-        foreach (var team in new Team[] { teamOne, teamTwo })
+        foreach (var team in new Team[] { TeamOne, TeamTwo })
         {
             var randomTiles = new Queue<Tile>(
-                Shuffle(
-                    tiles.Where(
-                        (tile) => (int)((tile.X - 1) / (xSize / 2.0)) == (team.RightToLeft ? 1 : 0)
-                    ).ToList()
-                )
+                tiles.Where(
+                    (tile) => (int)((tile.X - 1) / (xSize / 2.0)) == (team.RightToLeft ? 1 : 0)
+                ).ToList().Shuffle()
             );
             for (var i = 0; i < 5; i++)
             {
-                var b = Instantiate(ballmanTemplate);
-                b.gameObject.SetActive(true);
-                b.name = "Ballman " + i;
-                var t = randomTiles.Dequeue();
-                ballmen[t] = b;
-                b.MoveToTile(t, false);
-                b.Team = team;
-                team.Ballmen.Add(b);
-                b.OnPlayFinished += OnPlayFinished;
+                var tile = randomTiles.Dequeue();
+                CreateBallman(team, tile, "Ballman " + i);
             }
         }
+    }
+
+    private void CreateBallman(Team team, Tile tile, string name)
+    {
+        var newBallman = Instantiate(ballmanTemplate);
+        newBallman.gameObject.SetActive(true);
+        newBallman.name = name;
+        ballmen[tile] = newBallman;
+        newBallman.MoveToTile(tile, false);
+        newBallman.Team = team;
+        team.Ballmen.Add(newBallman);
     }
 
     private void MouseOver(Tile t)

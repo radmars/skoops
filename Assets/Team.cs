@@ -1,31 +1,27 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+
 public class Team
 {
-    private List<Ballman> ballmen;
-    private bool right;
+    public bool RightToLeft;
 
-    public Team()
+    public Team(string name)
     {
-        ballmen = new List<Ballman>();
+        Ballmen = new List<Ballman>();
+        Name = name;
+    }
+
+    public string Name
+    {
+        get;
+        private set;
     }
 
     public IList<Ballman> Ballmen
     {
-        get { return ballmen; }
-        private set { }
+        get;
+        private set;
     }
-
-    public bool RightToLeft
-    {
-        get
-        {
-            return right;
-        }
-        set
-        {
-            right = value;
-        }
-    } 
 
     public int Rotation
     {
@@ -35,5 +31,8 @@ public class Team
         }
     }
 
-    public bool HasBall { get; internal set; }
+    public bool HasBall()
+    {
+        return Ballmen.Any((Ballman b) => { return b.HasBall; });
+    }
 }

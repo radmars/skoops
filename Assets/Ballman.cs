@@ -13,7 +13,6 @@ public class Ballman : MonoBehaviour {
     public delegate void MoveListener(Ballman m);
 
     public event MoveListener OnMoveFinished;
-    public event PlayListener OnPlayFinished;
     private bool hasBall;
 
     static Dictionary<string, IPlay> playBook = new Dictionary<string, IPlay>();
@@ -69,11 +68,7 @@ public class Ballman : MonoBehaviour {
 
     public void RunPlay(string play)
     {
-        if (OnPlayFinished != null)
-        {
-            animator.SetTrigger(play);
-            OnPlayFinished(this, play);
-        }
+        animator.SetTrigger(play);
     }
 
     public void MoveToTile(Tile t, bool asMove)
