@@ -18,9 +18,14 @@ public class Ballman : MonoBehaviour {
     static Dictionary<string, IPlay> playBook = new Dictionary<string, IPlay>();
     static Ballman()
     {
-        foreach(var p in new IPlay[]
+        foreach (var p in new IPlay[]
         {
-            new Pass()
+            new Pass(),
+            new Shoot(),
+            new FakeShot(),
+            new GuardShot(),
+            new Pick(),
+            new ExtraMove(),
         })
         {
             playBook.Add(p.GetName(), p);
@@ -36,7 +41,14 @@ public class Ballman : MonoBehaviour {
 
     public IPlay[] GetPlays()
     {
-        return new IPlay[] { playBook["pass"] };
+        if (HasBall)
+        {
+            return new IPlay[] { playBook["pass"], playBook["sprint"], playBook["fake-shot"], playBook["shoot"] };
+        }
+        else
+        {
+            return new IPlay[] { playBook["guard-shot"], playBook["sprint"], };
+        }
     }
 
     public bool HasBall

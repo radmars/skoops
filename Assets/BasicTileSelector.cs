@@ -18,6 +18,7 @@ class BasicTileSelector : ITileSelector
             {
                 ballman.MoveToTile(tile, true);
                 c.SetBallmanPosition(ballman, tile);
+                c.TileSelector = null;
             }
             else
             {

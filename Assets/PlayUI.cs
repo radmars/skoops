@@ -46,7 +46,6 @@ public class PlayUI : MonoBehaviour
     private BasicTileSelector basicSelector;
     private TurnOrder turnOrder;
 
-
     void Start()
     {
         turnOrder = new TurnOrder(court.TeamOne, court.TeamTwo);
@@ -71,6 +70,14 @@ public class PlayUI : MonoBehaviour
     private void RunPlay(IPlay play, Ballman player, Ballman target)
     {
         play.ShootTheJ(player, target);
+        turnOrder.FinishTurn();
+        UpdateSelectedPlayer();
+        StartCoroutine(ResetSelector());
+    }
+
+    public IEnumerator ResetSelector()
+    {
+        yield return new WaitForFixedUpdate();
         court.TileSelector = basicSelector;
     }
 
@@ -92,15 +99,12 @@ public class PlayUI : MonoBehaviour
                 buttons.ForEach((b) => Destroy(b.gameObject));
                 buttons.Clear();
                 var selector = play.GetTargetSelector(bm);
+                court.TileSelector = selector;
                 if (selector != null)
                 {
-                    court.TileSelector = selector;
-
                     selector.OnSelected += (selected) =>
                     {
                         RunPlay(play, currentBallman, court.GetBallmanAt(selected));
-                        turnOrder.FinishTurn();
-                        UpdateSelectedPlayer();
                     };
                 }
                 else
