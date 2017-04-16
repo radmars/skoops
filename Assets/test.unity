@@ -1339,7 +1339,6 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   ballmanTemplate: {fileID: 206647240}
-  selector: {fileID: 1325353740}
   tileMarker: {fileID: 364883748}
 --- !u!114 &1195650982
 MonoBehaviour:
@@ -1352,10 +1351,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 783cea766f24c0044b156729d4512e83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  selectedBallmanMarker: {fileID: 1325353740}
   court: {fileID: 1195650981}
   buttonTemplate: {fileID: 654399242}
   canvas: {fileID: 1413754102}
-  buttons: []
 --- !u!4 &1195650984
 Transform:
   m_ObjectHideFlags: 0
@@ -1459,7 +1458,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1325353741
 Transform:
   m_ObjectHideFlags: 0
